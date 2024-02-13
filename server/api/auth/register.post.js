@@ -1,5 +1,5 @@
 import {sendError} from "h3"
-
+import { createUser } from "../../db/users.js"
 export default defineEventHandler(async (event)=>{
     const body = await useBody(event)
 
@@ -8,8 +8,21 @@ export default defineEventHandler(async (event)=>{
     if(!username || !email || !password || !repeatPassword || !name){
         return sendError(event, createError({statusCode:400, statusMessage:'Invalid params'}))
     }
+
+    if(password !== repeatPassword){
+        return sendError(event, createError({statusCode:400, statusMessage:'Passwords do not match'}))
+    }
+    const userData = {
+        username,
+        email,
+        password,
+        name
+    }
+
+    const user = await createUser()
+
     return {
-        body:body
+        body:user
     }
  
 })
